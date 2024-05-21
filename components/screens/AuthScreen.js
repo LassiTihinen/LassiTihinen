@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     borderRadius: 8,
     marginBottom: 16,
+    
   },
   toggleText: {
     color: '#3498db',

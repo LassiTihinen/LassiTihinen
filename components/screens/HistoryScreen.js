@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { db } from '../../components/FirebaseCfg';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, query, where } from 'firebase/firestore';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { getAuth } from '@firebase/auth'; // Import getAuth to get the current user
 
 const HistoryScreen = () => {
   const [activities, setActivities] = useState([]);
+  const auth = getAuth(); // Get the current user
+  const userId = auth.currentUser?.uid; // Get the user's ID
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'activities'));
+        const q = query(collection(db, 'activities'), where('userId', '==', userId));
+        const querySnapshot = await getDocs(q);
         const activitiesData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -22,8 +26,10 @@ const HistoryScreen = () => {
       }
     };
 
-    fetchActivities();
-  }, []);
+    if (userId) {
+      fetchActivities();
+    }
+  }, [userId]);
 
   const calculatePace = (seconds, distance) => {
     if (distance <= 0) {

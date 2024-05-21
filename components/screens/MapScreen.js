@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { Pedometer } from 'expo-sensors';
 import { db } from '../../components/FirebaseCfg';
 import { collection, addDoc } from 'firebase/firestore';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { captureRef } from 'react-native-view-shot';
+import { getAuth } from '@firebase/auth'; // Import getAuth to get the current user
 
 const MapScreen = () => {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
@@ -18,10 +18,10 @@ const MapScreen = () => {
   const [locationSubscription, setLocationSubscription] = useState(null);
   const [skippedReadings, setSkippedReadings] = useState(0);
   const [lastCoordinate, setLastCoordinate] = useState(null);
-  const [currentStepCount, setCurrentStepCount] = useState(0);
-  const [stepSubscription, setStepSubscription] = useState(null);
+  const [stepCount, setStepCount] = useState(0);
 
   const mapViewRef = useRef(null);
+  const auth = getAuth(); // Get the current user
 
   useEffect(() => {
     requestPermissions();
@@ -81,7 +81,7 @@ const MapScreen = () => {
     setTimer(0);
     setDistanceTravelled(0);
     setRouteCoordinates([]);
-    setCurrentStepCount(0);
+    setStepCount(0); // Reset step count
     startTimer();
 
     const watchId = await Location.watchPositionAsync({
@@ -111,12 +111,10 @@ const MapScreen = () => {
     });
     setLocationSubscription(watchId);
 
-    const stepSub = Pedometer.watchStepCount(result => {
-      console.log('New step detected:', result.steps);
-      setCurrentStepCount(result.steps);
+    const pedometerSubscription = await Pedometer.watchStepCount(result => {
+      setStepCount(result.steps);
     });
-
-    setStepSubscription(stepSub);
+    setPedometerSubscription(pedometerSubscription);
   };
 
   const captureMapView = async () => {
@@ -164,21 +162,26 @@ const MapScreen = () => {
     if (locationSubscription) {
       locationSubscription.remove();
     }
-
-    if (stepSubscription) {
-      stepSubscription.remove();
+    if (pedometerSubscription) {
+      pedometerSubscription.remove();
     }
   };
 
   const saveActivityData = async (snapshot) => {
+    const userId = auth.currentUser?.uid; // Get the user's ID
+    const totalTimeInMinutes = getTotalTimeInMinutes(timer);
+    const totalDistanceInKm = distanceTravelled / 1000;
+    const avgTimePerKm = timer; // Store the total time in seconds
+
     try {
       await addDoc(collection(db, 'activities'), {
-        avgTimePerKm: timer, // Send total time in seconds
+        userId, // Include the userId
+        avgTimePerKm,
         date: new Date().toLocaleDateString(),
         distanceTravelled: distanceTravelled.toFixed(2),
         totalTime: formatTime(timer),
-        steps: currentStepCount,
-        mapSnapshot: snapshot
+        mapSnapshot: snapshot,
+        steps: stepCount // Include step count
       });
       console.log("Activity data saved successfully");
     } catch (e) {
@@ -228,18 +231,17 @@ const MapScreen = () => {
       </MapView>
       <View style={styles.infoContainer}>
         <View style={styles.infoBox}>
-          <MaterialIcons name="timer" size={60} color="black" />
+          <MaterialIcons name="timer" size={70} color="black" />
           <Text style={styles.infoText}>{formatTime(timer)}</Text>
         </View>
         <View style={styles.infoBox}>
-          <MaterialIcons name="directions-walk" size={60} color="black" />
+          <MaterialIcons name="directions-walk" size={70} color="black" />
           <Text style={styles.infoText}>{distanceTravelled.toFixed(2)} metriä</Text>
         </View>
         <View style={styles.infoBox}>
-          <Ionicons name="footsteps" size={60} color="black" />
-          <Text style={styles.infoText}>Askeleet: {currentStepCount}</Text>
+          <Ionicons name="footsteps" size={70} color="black" />
+          <Text style={styles.infoText}>{stepCount} askeleet</Text>
         </View>
-
         <TouchableOpacity onPress={isTracking ? stopTracking : startTracking} style={styles.button}>
           <Text style={styles.buttonText}>{isTracking ? 'Lopeta treeni' : 'Aloita treeni'}</Text>
         </TouchableOpacity>
