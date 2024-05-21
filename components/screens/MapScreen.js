@@ -4,7 +4,7 @@ import MapView, { Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { db } from '../../components/FirebaseCfg';
 import { collection, addDoc } from 'firebase/firestore';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { captureRef } from 'react-native-view-shot';
 import { getAuth } from '@firebase/auth'; // Import getAuth to get the current user
 
