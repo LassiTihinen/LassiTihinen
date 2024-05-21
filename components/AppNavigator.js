@@ -16,9 +16,9 @@ const AppNavigator = ({ user, handleAuthentication, email, setEmail, password, s
           <Stack.Screen name="Home" options={{ headerShown: false }}>
             {props => <HomeScreen {...props} user={user} handleLogout={handleAuthentication} />}
           </Stack.Screen>
-          <Stack.Screen name="StepCounter" component={StepCounter} options={{ headerShown: true }} />
-          <Stack.Screen name="MapScreen" component={MapScreen} options={{headerShown: true}}/>
-          <Stack.Screen name='HistoryScreen' component={HistoryScreen} options={{headerShown: true}}/>
+          <Stack.Screen name="Askelmittari" component={StepCounter} options={{ headerShown: true }} />
+          <Stack.Screen name="Lenkkiseuranta" component={MapScreen} options={{headerShown: true}}/>
+          <Stack.Screen name='Lenkkihistoria' component={HistoryScreen} options={{headerShown: true}}/>
         </>
       ) : (
         <Stack.Screen name="Auth" options={{ headerShown: false }}>

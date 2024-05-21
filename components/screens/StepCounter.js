@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Pedometer } from 'expo-sensors';
+import { Ionicons, Octicons, MaterialIcons } from '@expo/vector-icons';
 
 const StepCounter = () => {
   console.log("Entered StepCounter");
@@ -57,8 +58,18 @@ const StepCounter = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Pedometer.isAvailableAsync(): {isPedometerAvailable}</Text>
-      <Text>Walk! And watch this go up: {currentStepCount}</Text>
+      <View style={styles.infoBox}>
+        <Octicons name="meter" size={50} color="black" />
+        <Text style={styles.infoText}>
+          Mittari toiminnassa: {isPedometerAvailable === 'true' ? (
+            <MaterialIcons name="check-circle" size={30} color="green" />
+          ) : null}
+        </Text>
+      </View>
+      <View style={styles.infoBox}>
+        <Ionicons name="footsteps" size={50} color="black" />
+        <Text style={styles.infoText}>Aktiiviset askeleet: {currentStepCount}</Text>
+      </View>
     </View>
   );
 }
@@ -69,6 +80,15 @@ const styles = StyleSheet.create({
     marginTop: 15,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  infoText: {
+    fontSize: 25,
+    marginLeft: 10,
   },
 });
 

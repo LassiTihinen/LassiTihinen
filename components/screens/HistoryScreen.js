@@ -1,44 +1,91 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { db } from '../../components/FirebaseCfg';
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
-const HistoryScreen = ({ navigation }) => {
-    console.log("Entered HistoryScreen");
-  const activities = [
-    {
-      id: 1,
-      date: "15.5 Wednesday",
-      totalTime: "35 minutes",
-      distanceTravelled: "7",
-      avgTimePerKm: "5 minutes/km",
-      routeSnapshotUrl: "URL_TO_STATIC_MAP_IMAGE"
-    },
-    {
-      id: 2,
-      date: "10.5 Saturday",
-      totalTime: "45 minutes",
-      distanceTravelled: "7.5",
-      avgTimePerKm: "6 minutes/km",
-      routeSnapshotUrl: "URL_TO_STATIC_MAP_IMAGE"
-    },
-    {
-      id: 3,
-      date: "20.5 Monday",
-      distanceTravelled: "3.33",
-      totalTime: "20 minutes",
-      avgTimePerKm: "6 minutes/km",
-      routeSnapshotUrl: "URL_TO_STATIC_MAP_IMAGE"
-    }
-  ];
+const HistoryScreen = () => {
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'activities'));
+        const activitiesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        console.log("Fetched activities:", activitiesData); // Log fetched data
+        setActivities(activitiesData);
+      } catch (error) {
+        console.error("Failed to fetch activities:", error);
+      }
+    };
+
+    fetchActivities();
+  }, []);
+
+  const handleDelete = (activityId) => {
+    Alert.alert(
+      "Poista treeni",
+      "Haluatko varmasti poistaa tämän treenin?",
+      [
+        {
+          text: "Ei",
+          style: "cancel"
+        },
+        {
+          text: "Kyllä",
+          onPress: async () => {
+            try {
+              // Delete from Firestore
+              await deleteDoc(doc(db, 'activities', activityId));
+              // Delete from frontend
+              setActivities(activities.filter(activity => activity.id !== activityId));
+              console.log("Activity deleted successfully");
+            } catch (error) {
+              console.error("Failed to delete activity:", error);
+            }
+          },
+          style: "destructive"
+        }
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {activities.map(activity => (
+      {activities.map((activity) => (
         <View key={activity.id} style={styles.card}>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(activity.id)}>
+            <MaterialIcons name="close" size={24} color="red" />
+          </TouchableOpacity>
           <Text style={styles.title}>{activity.date}</Text>
-          <Image style={styles.mapImage} source={{ uri: activity.routeSnapshotUrl }} />
-          <Text style={styles.info}>Total Distance: {activity.distanceTravelled} kilometers</Text>
-          <Text style={styles.info}>Total Time: {activity.totalTime} minutes</Text>
-          <Text style={styles.info}>Average Time Per Km: {activity.avgTimePerKm}</Text>
+          {activity.mapSnapshot ? (
+            <Image
+              style={styles.mapImage}
+              source={{ uri: activity.mapSnapshot }}
+            />
+          ) : (
+            <Text style={styles.info}>Kuvaa ei saatavilla</Text>
+          )}
+          <View style={styles.infoBox}>
+            <MaterialIcons name="timer" size={24} color="black" />
+            <Text style={styles.info}>Lenkkiaika: {activity.totalTime}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <MaterialIcons name="directions-walk" size={24} color="black" />
+            <Text style={styles.info}>Matkan pituus: {activity.distanceTravelled}m</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <MaterialIcons name="speed" size={24} color="black" />
+            <Text style={styles.info}>Aika kilometriä kohden: {activity.avgTimePerKm}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Ionicons name="footsteps" size={24} color="black" />
+            <Text style={styles.info}>Askeleet: {activity.steps}</Text>
+          </View>
         </View>
       ))}
     </ScrollView>
@@ -48,14 +95,15 @@ const HistoryScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    padding: 20
   },
   card: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
     marginBottom: 10,
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'relative' // Make the card position relative
   },
   title: {
     fontSize: 18,
@@ -66,8 +114,21 @@ const styles = StyleSheet.create({
     height: 200,
     marginVertical: 10
   },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+    justifyContent: 'flex-start', // Ensure items are aligned to the start
+    width: '100%' // Ensure the infoBox takes the full width
+  },
   info: {
-    fontSize: 16
+    fontSize: 16,
+    marginLeft: 10
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10
   }
 });
 

@@ -1,43 +1,39 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, Image, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import Banner from '../Banner';
+import { MaterialIcons } from '@expo/vector-icons';
 
-const HomeScreen = ({ user, handleLogout, navigation}) => {
+const HomeScreen = ({ user, handleLogout, navigation }) => {
   console.log('Entered HomeScreen');
-  console.log('Props received in HomeScreen:', { user, handleLogout, navigation }); // This line will log the props
   
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-    <StatusBar/>
+      <StatusBar />
       <View style={styles.content}>
-        <Banner appName='Urheilusuoritukset'/>
-        <Text style={styles.title}>Tervetuloa {user.email} !</Text>
-        <Text style={styles.subtitle}>Tilapäiskuvat</Text>
-        <View style={styles.imageContainer}>
-        <View style={styles.imageButtonContainer}>
-          <Image source={require('../../assets/1.png')} style={styles.image} />
-          <TouchableOpacity style={styles.imageButton} onPress={() => navigation.navigate('StepCounter')}>
+      <Banner appName='Urheilusuoritukset' />
+        <Text style={styles.title}>Tervetuloa {user.email}!</Text>
 
-            <Text style={styles.imageButtonText}>Askelmittari</Text>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Askelmittari')}>
+            <MaterialIcons name="directions-walk" size={70} color="black" />
+            <Text style={styles.iconButtonText}>Askelmittari</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Lenkkiseuranta')}>
+            <MaterialIcons name="map" size={70} color="black" />
+            <Text style={styles.iconButtonText}>Treeni kartalla</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('Lenkkihistoria')}>
+            <MaterialIcons name="history" size={70} color="black" />
+            <Text style={styles.iconButtonText}>Lenkkihistoria</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.imageButtonContainer}>
-          <Image source={require('../../assets/2.png')} style={styles.image} />
-          <TouchableOpacity style={styles.imageButton} onPress={() => navigation.navigate('MapScreen')}>
-            <Text style={styles.imageButtonText}>Treeni kartalla</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.imageButtonContainer}>
-          <Image source={require('../../assets/3.png')} style={styles.image} />
-          <TouchableOpacity style={styles.imageButton} onPress={() => navigation.navigate('HistoryScreen')}>
-            <Text style={styles.imageButtonText}>Lenkkihistoria</Text>
-          </TouchableOpacity>
-        </View>
-</View>
-        <View style={styles.buttonContainer}>
-          <Button title="Kirjaudu ulos" onPress={handleLogout} />
-        </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <MaterialIcons name="logout" size={40} color="white" />
+          <Text style={styles.logoutButtonText}>Kirjaudu ulos</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -46,7 +42,7 @@ const HomeScreen = ({ user, handleLogout, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#AAA',
+    backgroundColor: '#fff',
   },
   content: {
     flexGrow: 1,
@@ -56,46 +52,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     marginBottom: 20,
     textAlign: 'center',
   },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  imageContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  iconContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-around',
     marginBottom: 20,
   },
-  image: {
-    width: 100,
-    height: 100,
-    marginHorizontal: 10,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    borderRadius: 50,
-    backgroundColor: 'red',
-  },
-  imageButtonContainer: {
+  iconButton: {
     alignItems: 'center',
     marginBottom: 20,
   },
-  imageButton: {
+  iconButtonText: {
     marginTop: 10,
-    backgroundColor: 'blue',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'black',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    marginTop: 20,
   },
-  imageButtonText: {
+  logoutButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
 
 export default HomeScreen;
+

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, StatusBar } from 'react-native';
-import Banner from '../Banner'; // Adjust the import path as needed
+import Banner from '../Banner';
 
 const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication }) => {
   return (
@@ -8,10 +8,9 @@ const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogi
       <StatusBar/>
       <Banner appName="Urheilusuoritukset"/>
       <Image 
-        source={require('../../assets/wörkout.png')} // Adjust the path as needed
-        style={[styles.image, {height: 300, width: '100%'}]}
+        source={require('../../assets/wörkout.png')}
+        style={[styles.image, {height: "35%", width: "100%"}]}
       />
-      <Text style={styles.title}>{isLogin ? 'Kirjaudu' : 'Rekisteröidy'}</Text>
       <TextInput
         style={styles.input}
         value={email}
