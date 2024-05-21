@@ -1,2 +1,9 @@
-You have to include your own .env file with these instructions; 
-https://docs.expo.dev/guides/using-firebase/
+You have to include your own .env file with these values;
+  apiKey: 'your-api-key'
+  authDomain: 'your-project-id.firebaseapp.com'
+  databaseURL: 'your-https://project-id.firebaseio.com'
+  projectId: 'your-project-id'
+  storageBucket: 'your-project-id.appspot.com'
+  messagingSenderId: 'your-sender-id'
+  appId: 'your-app-id'
+  measurementId: 'your-G-measurement-id'
