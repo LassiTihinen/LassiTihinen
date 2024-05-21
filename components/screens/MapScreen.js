@@ -171,22 +171,13 @@ const MapScreen = () => {
   };
 
   const saveActivityData = async (snapshot) => {
-    const totalTimeInMinutes = getTotalTimeInMinutes(timer);
-    const totalDistanceInKm = distanceTravelled / 1000;
-    let avgTimePerKm;
-    if (totalDistanceInKm >= 1) {
-      avgTimePerKm = (timer / totalDistanceInKm).toFixed(2);
-    } else {
-      avgTimePerKm = "Ei määritelty";
-    }
-
     try {
       await addDoc(collection(db, 'activities'), {
-        avgTimePerKm,
+        avgTimePerKm: timer, // Send total time in seconds
         date: new Date().toLocaleDateString(),
         distanceTravelled: distanceTravelled.toFixed(2),
         totalTime: formatTime(timer),
-        steps: currentStepCount, // Add steps to the data being saved
+        steps: currentStepCount,
         mapSnapshot: snapshot
       });
       console.log("Activity data saved successfully");

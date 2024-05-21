@@ -25,7 +25,7 @@ const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogi
         secureTextEntry
       />
       <View style={styles.buttonContainer}>
-        <Button title={isLogin ? 'Kirjaudu' : 'Rekisteröidy'} onPress={handleAuthentication} color="#3498db" />
+        <Button title={isLogin ? 'Kirjaudu' : 'Rekisteröidy'} onPress={handleAuthentication} color="black" />
       </View>
       <View style={styles.bottomContainer}>
         <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
@@ -67,11 +67,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   buttonContainer: {
+    borderRadius: 8,
     marginBottom: 16,
   },
   toggleText: {
     color: '#3498db',
     textAlign: 'center',
+    fontSize: 19,
   },
   bottomContainer: {
     marginTop: 20,

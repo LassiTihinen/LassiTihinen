@@ -25,6 +25,16 @@ const HistoryScreen = () => {
     fetchActivities();
   }, []);
 
+  const calculatePace = (seconds, distance) => {
+    if (distance <= 0) {
+      return "Ei määritelty";
+    }
+    const pacePerKmInSeconds = seconds / (distance / 1000); // Time in seconds per km
+    const minutes = Math.floor(pacePerKmInSeconds / 60);
+    const secondsRemainder = Math.floor(pacePerKmInSeconds % 60);
+    return `${minutes} m : ${secondsRemainder < 10 ? '0' : ''}${secondsRemainder} s`;
+  };
+
   const handleDelete = (activityId) => {
     Alert.alert(
       "Poista treeni",
@@ -80,7 +90,7 @@ const HistoryScreen = () => {
           </View>
           <View style={styles.infoBox}>
             <MaterialIcons name="speed" size={24} color="black" />
-            <Text style={styles.info}>Aika kilometriä kohden: {activity.avgTimePerKm}</Text>
+            <Text style={styles.info}>Aika kilometriä kohden: {calculatePace(activity.avgTimePerKm, activity.distanceTravelled)}</Text>
           </View>
           <View style={styles.infoBox}>
             <Ionicons name="footsteps" size={24} color="black" />

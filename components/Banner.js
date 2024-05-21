@@ -11,7 +11,7 @@ const Banner = ({ appName }) => {
 
 const styles = StyleSheet.create({
   banner: {
-    backgroundColor: '#3498db',
+    backgroundColor: 'black',
     padding: 10,
     marginBottom: 20,
     borderRadius: 8,
