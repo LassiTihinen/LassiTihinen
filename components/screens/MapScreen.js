@@ -7,6 +7,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { captureRef } from 'react-native-view-shot';
 import { getAuth } from '@firebase/auth'; // Import getAuth to get the current user
+import { Pedometer } from 'expo-sensors';
 
 const MapScreen = () => {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
@@ -81,7 +82,7 @@ const MapScreen = () => {
     setTimer(0);
     setDistanceTravelled(0);
     setRouteCoordinates([]);
-    setStepCount(0); // Reset step count
+    setStepCount(0);
     startTimer();
 
     const watchId = await Location.watchPositionAsync({
@@ -119,6 +120,10 @@ const MapScreen = () => {
 
   const captureMapView = async () => {
     try {
+      const boundingBox = calculateBoundingBox(routeCoordinates);
+      mapViewRef.current.animateToRegion(boundingBox, 1000);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       const uri = await captureRef(mapViewRef, {
         format: 'png',
         quality: 0.8,
@@ -167,21 +172,19 @@ const MapScreen = () => {
     }
   };
 
-  const saveActivityData = async (snapshot) => {
-    const userId = auth.currentUser?.uid; // Get the user's ID
-    const totalTimeInMinutes = getTotalTimeInMinutes(timer);
-    const totalDistanceInKm = distanceTravelled / 1000;
-    const avgTimePerKm = timer; // Store the total time in seconds
+   const saveActivityData = async (snapshot) => {
+    const userId = auth.currentUser?.uid;
+    const avgTimePerKm = timer;
 
     try {
       await addDoc(collection(db, 'activities'), {
-        userId, // Include the userId
+        userId,
         avgTimePerKm,
         date: new Date().toLocaleDateString(),
         distanceTravelled: distanceTravelled.toFixed(2),
         totalTime: formatTime(timer),
         mapSnapshot: snapshot,
-        steps: stepCount // Include step count
+        steps: stepCount
       });
       console.log("Activity data saved successfully");
     } catch (e) {
